@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+    <head>
+        {% include 'header.html' %}
+    </head>
+    <body>
+        <div class="d-flex" id="wrapper">
+            <!-- Sidebar-->
+            {% include 'sidebar.html' %}
+            <!-- Page content wrapper-->
+            <div id="page-content-wrapper">
+                <!-- Page content-->
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+        <!-- Bootstrap core JS-->
+        {% include 'footer.html' %}
+    </body>
+</html>
