@@ -4,15 +4,143 @@
 <div class="container-fluid">
     <h3 class="mt-4">Симетричне шифрування. Використання шифрів перестановки</h3>
 </div>
+<!-- Завдання 1 -->
 <div class="container-fluid">
     <h4 class="mt-4">Шифр з одинарною перестановкою</h4>
-    <form>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="encrypt_form">
         <div class="form-group mb-3">
-            <input type="text" class="form-control" id="textInput" placeholder="Введіть повідомлення">
+            <input type="text" class="form-control" id="textInput" name="message" placeholder="Введіть повідомлення" value="{{ original_message }}">
         </div>
+
+        {% if encrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Шифрограма:</strong> {{ encrypted_message }}
+            <br>
+            <strong>Ключ:</strong> {{ encryption_key }}
+        </div>
+        {% endif %}
+
         <div class="mb-3">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
         </div>
     </form>
 </div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="encrypted_message" placeholder="Введіть повідомлення">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="encryption_key" placeholder="Введіть ключ">
+        </div>
+
+        {% if decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ decrypted_message }}
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+<!-- Завдання 2 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Шифр з маршрутною перестановкою</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="route_encrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="route_message" placeholder="Введіть повідомлення" value="{{ route_original_message }}">
+        </div>
+
+        {% if route_encrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Шифрограма:</strong> {{ route_encrypted_message }}
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="route_decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="route_encrypted_message" placeholder="Введіть зашифроване повідомлення">
+        </div>
+
+        {% if route_decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ route_decrypted_message }}
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+<!-- Завдання 3 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Шифр множинної перестановки</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="multilevel_encrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="multilevel_message" placeholder="Введіть повідомлення" value="{{ multilevel_original_message }}">
+        </div>
+
+        {% if multilevel_encrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Шифрограма:</strong> {{ multilevel_encrypted_message }}
+            <br>
+            <strong>Ключ:</strong> {{ multilevel_encryption_key }}
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="multilevel_decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="multilevel_encrypted_message" placeholder="Введіть зашифроване повідомлення">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="multilevel_encryption_key" placeholder="Введіть ключ">
+        </div>
+
+        {% if multilevel_decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ multilevel_decrypted_message }}
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
 {% endblock %}
