@@ -31,47 +31,42 @@ class SinglePermutationCipher:
 
 
 class RoutePermutationCipher:
-    def __init__(self):
-        pass
+    def __init__(self, seed=None):
+        self.seed = seed
+        if seed is not None:
+            random.seed(seed)
+
+    def generate_route(self):
+        indices = [0, 1, 2, 3]
+        random.shuffle(indices)
+        return indices
 
     def encrypt(self, text):
         text = text.replace(" ", "_")
-        blocks = []
-        for i in range(0, len(text), 4):
-            blocks.append(text[i : i + 4].ljust(4, "_"))
-        encrypted_figures = [[], [], []]
-        for block in blocks:
-            encrypted_figures[0].append(block[1])
-            encrypted_figures[1].append(block[0])
-            encrypted_figures[1].append(block[2])
-            encrypted_figures[2].append(block[3])
+        blocks = [text[i:i+4].ljust(4, "_") for i in range(0, len(text), 4)]
 
-        encrypted_text = "".join("".join(row) for row in encrypted_figures)
+        route = self.generate_route()
+        key = "".join(str(i) for i in route)
+        encrypted_text = ""
+        for pos in route:
+            encrypted_text += "".join(block[pos] for block in blocks)
 
-        return encrypted_text
+        return encrypted_text, key
 
-    def decrypt(self, encrypted_text):
-        num_blocks = len(encrypted_text) // 4
+    def decrypt(self, encrypted_text, key):
+        # Determine number of blocks
+        key = [int(i) for i in key]
+        num_blocks = len(encrypted_text) // len(key)
+        blocks = [["" for _ in range(len(key))] for _ in range(num_blocks)]
 
-        decrypted_blocks = ["" for _ in range(num_blocks)]
+        # Extract segments and place them according to the route
+        for i, pos in enumerate(key):
+            segment = encrypted_text[i * num_blocks:(i + 1) * num_blocks]
+            for j in range(num_blocks):
+                blocks[j][pos] = segment[j]
 
-        index = 0
-        for i in range(num_blocks):
-            decrypted_blocks[i] = ["", "", "", ""]
-            decrypted_blocks[i][1] = encrypted_text[index]
-            index += 1
-
-        for i in range(num_blocks):
-            decrypted_blocks[i][0] = encrypted_text[index]
-            index += 1
-            decrypted_blocks[i][2] = encrypted_text[index]
-            index += 1
-
-        for i in range(num_blocks):
-            decrypted_blocks[i][3] = encrypted_text[index]
-            index += 1
-
-        decrypted_text = "".join("".join(block) for block in decrypted_blocks)
+        # Combine blocks and format
+        decrypted_text = "".join("".join(block) for block in blocks)
         return decrypted_text.replace("_", " ").strip()
 
 

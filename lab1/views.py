@@ -34,16 +34,18 @@ def lab1(request):
             return render(request, "lab1.html", context)
         elif form_type == "route_encrypt_form":
             message = request.POST.get("route_message", "")
-            encrypted_message = RoutePermutationCipher().encrypt(message)
+            encrypted_message, key = RoutePermutationCipher().encrypt(message)
 
             # Add both original and processed messages to context
             context["route_original_message"] = message
             context["route_encrypted_message"] = encrypted_message
+            context["route_encryption_key"] = key
 
             return render(request, "lab1.html", context)
         elif form_type == "route_decrypt_form":
             encrypted_message = request.POST.get("route_encrypted_message", "")
-            decrypted_message = RoutePermutationCipher().decrypt(encrypted_message)
+            encryption_key = request.POST.get("route_encryption_key", "")
+            decrypted_message = RoutePermutationCipher().decrypt(encrypted_message, encryption_key)
 
             # Add both original and processed messages to context
             context["route_decrypted_message"] = decrypted_message
