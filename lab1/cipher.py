@@ -31,10 +31,8 @@ class SinglePermutationCipher:
 
 
 class RoutePermutationCipher:
-    def __init__(self, seed=None):
-        self.seed = seed
-        if seed is not None:
-            random.seed(seed)
+    def __init__(self):
+        pass
 
     def generate_route(self):
         indices = [0, 1, 2, 3]
