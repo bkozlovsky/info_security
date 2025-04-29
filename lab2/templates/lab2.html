@@ -198,7 +198,14 @@
         <div class="alert alert-success mb-3">
             <strong>Шифрограма:</strong> {{ variant_encrypted_message }}
             <br>
-            <strong>Ключ:</strong> {{ variant_encryption_key }}
+            <strong>Ключ:</strong>
+            <br>
+            {{ variant_encryption_matrix | safe }}
+            <!-- Додаємо прихований текстовий елемент із ключем для копіювання -->
+            <textarea id="polybiusKeyText" style="display: none;">{{ variant_encryption_key }}</textarea>
+            <button type="button" class="btn btn-sm btn-secondary ms-2" onclick="copyPolybiusKey()">
+                <i class="fas fa-copy"></i> Копіювати ключ
+            </button>
         </div>
         {% endif %}
 
@@ -219,9 +226,9 @@
             <input type="text" class="form-control" id="textInput" name="variant_encryption_key" placeholder="Введіть ключ">
         </div>
 
-        {% if multilevel_decrypted_message %}
+        {% if variant_decrypted_message %}
         <div class="alert alert-success mb-3">
-            <strong>Розшифроване повідомлення:</strong> {{ multilevel_decrypted_message }}
+            <strong>Розшифроване повідомлення:</strong> {{ variant_decrypted_message }}
         </div>
         {% endif %}
 

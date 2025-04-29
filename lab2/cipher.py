@@ -1,6 +1,8 @@
 import random
 import numpy as np
 import math
+import pandas as pd
+from typing import Tuple, Dict, List, Optional
 
 class PolybianSquare:
     def __init__(self, alphabet=None):
@@ -339,3 +341,280 @@ class HillCipher:
         decrypted_text = self.numbers_to_text(decrypted_numbers)
 
         return decrypted_text
+
+class VariantCipher:
+    def __init__(self,
+                 row_markers: Optional[List[str]] = None,
+                 col_markers: Optional[List[str]] = None,
+                 size: int = 6):
+
+        self.size = size
+        self.row_markers = row_markers
+        self.col_markers = col_markers
+
+        # Словники для зберігання зв'язків між символами та позиціями
+        self.char_to_positions = {}  # Відображає символи на їх позиції в таблиці
+        self.position_to_char = {}   # Відображає позиції (рядок, стовпець) на символи
+
+        # Якщо маркери не надані, генеруємо їх
+        if row_markers is None or col_markers is None:
+            self._generate_markers()
+        else:
+            if not self._validate_markers(row_markers, col_markers):
+                raise ValueError("Маркери рядків та стовпців не повинні мати спільних літер")
+
+        # Завжди генеруємо таблицю випадковим чином
+        self._generate_table()
+
+    def _validate_markers(self, row_markers: List[str], col_markers: List[str]) -> bool:
+        """Перевіряє, що маркери рядків та стовпців не мають спільних літер."""
+        row_letters = set(''.join(row_markers))
+        col_letters = set(''.join(col_markers))
+        return len(row_letters.intersection(col_letters)) == 0
+
+    def _generate_markers(self):
+        """Генерує маркери рядків та стовпців, які не мають спільних літер."""
+        # Українські літери для маркерів рядків та стовпців
+        all_letters = "АБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"
+        letters = random.sample(all_letters, min(self.size * 4, len(all_letters)))
+
+        # Розділяємо на дві групи для маркерів рядків та стовпців
+        midpoint = len(letters) // 2
+        row_letters = letters[:midpoint]
+        col_letters = letters[midpoint:]
+
+        # Створюємо двобуквені комбінації
+        self.row_markers = [row_letters[i] + row_letters[i+1] for i in range(0, len(row_letters) - 1, 2)]
+        self.col_markers = [col_letters[i] + col_letters[i+1] for i in range(0, len(col_letters) - 1, 2)]
+
+        # Переконуємося, що маємо достатньо маркерів
+        while len(self.row_markers) < self.size:
+            self.row_markers.append(self.row_markers[-1] + "1")
+
+        while len(self.col_markers) < self.size:
+            self.col_markers.append(self.col_markers[-1] + "1")
+
+    def _generate_table(self):
+        """Генерує випадкову таблицю шифрозамін."""
+        # Український алфавіт без повторення символів
+        alphabet = "АБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ-"
+        chars = list(alphabet)
+        random.shuffle(chars)  # Перемішуємо символи випадковим чином
+
+        # Створюємо таблицю
+        self.table = []
+        char_index = 0
+
+        for row in range(self.size):
+            row_data = []
+            for col in range(self.size):
+                if char_index < len(chars):
+                    char = chars[char_index]
+                    row_data.append(char)
+
+                    # Додаємо до словників відображення
+                    if char not in self.char_to_positions:
+                        self.char_to_positions[char] = []
+                    self.char_to_positions[char].append((row, col))
+
+                    self.position_to_char[(row, col)] = char
+
+                    char_index += 1
+                else:
+                    # Заповнюємо решту клітинок замінником
+                    row_data.append("-")
+                    self.position_to_char[(row, col)] = "-"
+
+            self.table.append(row_data)
+
+    def get_table_display(self) -> str:
+        """Отримує HTML-представлення таблиці шифрозамін."""
+        df = pd.DataFrame(self.table)
+        df.columns = self.col_markers
+        df.index = self.row_markers
+
+        # Додаємо необхідні стилі CSS
+        css_style = """
+        <style>
+            .cipher-table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            .cipher-table th, .cipher-table td {
+                border: 1px solid #dee2e6;
+                padding: 8px;
+                text-align: center;
+                vertical-align: middle;
+            }
+            .cipher-table thead th {
+                background-color: #f8f9fa;
+                font-weight: bold;
+            }
+            .cipher-table tbody th {
+                background-color: #f8f9fa;
+                font-weight: bold;
+            }
+        </style>
+        """
+
+        # Генеруємо HTML таблиці
+        html = df.to_html(
+            classes="cipher-table",
+            border=1,
+            index=True,
+            escape=False,
+            justify='center'
+        )
+
+        return css_style + html
+
+    def encrypt(self, plaintext: str) -> Tuple[str, Dict]:
+        """
+        Шифрує текст використовуючи варіантний шифр.
+
+        Аргументи:
+            plaintext: Текст для шифрування
+
+        Повертає:
+            Кортеж, що містить:
+                - Зашифрований текст
+                - Ключ шифрування (таблиця шифрозамін, маркери та структура оригінального тексту)
+        """
+        plaintext_upper = plaintext.upper()
+        encrypted_parts = []
+        original_structure = []
+        char_count = 0
+
+        # Зберігаємо структуру вихідного тексту
+        for i, char in enumerate(plaintext):
+            if char.isspace():
+                original_structure.append((i, 'space'))
+            else:
+                original_structure.append((i, 'char'))
+                char_count += 1
+
+        # Шифруємо кожний символ окремо (крім пробілів)
+        for char in plaintext_upper:
+            if char.isspace():
+                continue  # Пропускаємо пробіли при шифруванні
+
+            if char in self.char_to_positions:
+                # Отримуємо всі можливі позиції для цього символу
+                positions = self.char_to_positions[char]
+                # Вибираємо випадкову позицію
+                row, col = random.choice(positions)
+                row_marker = self.row_markers[row]
+                col_marker = self.col_markers[col]
+
+                # Генеруємо всі можливі комбінації окремих літер з маркерів рядків та стовпців
+                combinations = []
+                for r_letter in row_marker:
+                    for c_letter in col_marker:
+                        combinations.append(r_letter + c_letter)
+                        combinations.append(c_letter + r_letter)
+
+                # Вибираємо випадкову комбінацію
+                encrypted_parts.append(random.choice(combinations))
+            else:
+                # Якщо символ відсутній у таблиці шифрозамін, використовуємо спеціальний маркер
+                encrypted_parts.append(f"<{char}>")  # Спеціальний формат для нешифрованих символів
+
+        # Об'єднуємо зашифровані частини пробілами
+        encrypted_text = " ".join(encrypted_parts)
+
+        # Ключ шифрування включає таблицю, маркери та оригінальну структуру тексту
+        key = {
+            "table": self.table,
+            "row_markers": self.row_markers,
+            "col_markers": self.col_markers,
+            "original_structure": original_structure
+        }
+
+        return encrypted_text, key
+
+    def decrypt(self, ciphertext: str, key: Dict) -> str:
+        """
+        Розшифровує текст використовуючи наданий ключ.
+
+        Аргументи:
+            ciphertext: Зашифрований текст
+            key: Ключ шифрування, що містить таблицю шифрозамін, маркери та структуру оригінального тексту
+
+        Повертає:
+            Розшифрований текст з відновленою оригінальною структурою
+        """
+        # Завантажуємо компоненти ключа
+        table = key["table"]
+        row_markers = key["row_markers"]
+        col_markers = key["col_markers"]
+        original_structure = key["original_structure"]
+
+        # Створюємо відображення для розшифрування
+        row_marker_letters = {}
+        for idx, marker in enumerate(row_markers):
+            for letter in marker:
+                if letter not in row_marker_letters:
+                    row_marker_letters[letter] = []
+                row_marker_letters[letter].append(idx)
+
+        col_marker_letters = {}
+        for idx, marker in enumerate(col_markers):
+            for letter in marker:
+                if letter not in col_marker_letters:
+                    col_marker_letters[letter] = []
+                col_marker_letters[letter].append(idx)
+
+        # Розділяємо зашифрований текст на частини
+        parts = ciphertext.split()
+        decrypted_chars = []
+
+        for part in parts:
+            # Перевіряємо чи це спеціальний маркер для нешифрованих символів
+            if part.startswith("<") and part.endswith(">") and len(part) >= 3:
+                decrypted_chars.append(part[1:-1])  # Витягуємо символ між < >
+                continue
+
+            if len(part) != 2:
+                # Якщо не двобуквена частина, залишаємо як є
+                decrypted_chars.append(part)
+                continue
+
+            first_letter, second_letter = part[0], part[1]
+            candidates = []
+
+            # Спробуємо першу літеру як маркер рядка, другу як маркер стовпця
+            if first_letter in row_marker_letters and second_letter in col_marker_letters:
+                for row in row_marker_letters[first_letter]:
+                    for col in col_marker_letters[second_letter]:
+                        if 0 <= row < len(table) and 0 <= col < len(table[0]):
+                            candidates.append(table[row][col])
+
+            # Спробуємо першу як маркер стовпця, другу як маркер рядка
+            if first_letter in col_marker_letters and second_letter in row_marker_letters:
+                for col in col_marker_letters[first_letter]:
+                    for row in row_marker_letters[second_letter]:
+                        if 0 <= row < len(table) and 0 <= col < len(table[0]):
+                            candidates.append(table[row][col])
+
+            # Якщо є кандидати, вибираємо перший
+            if candidates:
+                decrypted_chars.append(candidates[0])
+            else:
+                # Якщо немає кандидатів, залишаємо як є
+                decrypted_chars.append(part)
+
+        # Відновлюємо оригінальну структуру тексту
+        result = [""] * len(original_structure)
+        char_index = 0
+
+        for i, (pos, type_) in enumerate(original_structure):
+            if type_ == 'space':
+                result[pos] = " "
+            else:
+                if char_index < len(decrypted_chars):
+                    result[pos] = decrypted_chars[char_index]
+                    char_index += 1
+                else:
+                    result[pos] = "?"  # Заповнювач на випадок помилки
+
+        return "".join(result)
