@@ -32,8 +32,16 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "livereload",
+    "labs",
     "lab1.apps.Lab1Config",
     "lab2.apps.Lab2Config",
+    "lab3.apps.Lab3Config",
+    "lab4.apps.Lab4Config",
+    "lab5.apps.Lab5Config",
+    "lab6.apps.Lab6Config",
+    "lab7.apps.Lab7Config",
+    "lab8.apps.Lab8Config",
+    "lab9.apps.Lab9Config",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

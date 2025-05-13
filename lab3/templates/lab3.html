@@ -1,1 +1,119 @@
+{% extends 'base.html' %}
 
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mt-4">Симетричне шифрування. Використання шифрів гамування</h3>
+</div>
+<!-- Завдання 1 -->
+<div class="container-fluid">
+    <h4 class="mt-4">По модулю N</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="modaddition_encrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="modaddition_original_message" placeholder="Введіть повідомлення" value="{{ modaddition_original_message }}">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="modaddition_encryption_key" placeholder="Введіть ключ">
+        </div>
+
+        {% if modaddition_encrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Шифрограма:</strong> {{ modaddition_encrypted_message }}
+            <br>
+            <strong>Ключ:</strong> {{ modaddition_encryption_key }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="modaddition_decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="modaddition_encrypted_message" placeholder="Введіть повідомлення">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="modaddition_encryption_key" placeholder="Введіть ключ">
+        </div>
+
+        {% if modaddition_decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ modaddition_decrypted_message }}
+            <br>
+            <strong>Розшифрована таблиця:</strong>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped text-center align-middle">
+                    <tbody>
+                        {% for row in modaddition_decrypted_table %}
+                            <tr>
+                                {% for cell in row %}
+                                    <td>{{ cell }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+<!-- Завдання 2 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Адитивний шифр</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="additive_encrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="additive_original_message" placeholder="Введіть повідомлення" value="{{ additive_original_message }}">
+        </div>
+
+        {% if additive_encrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Шифрограма:</strong> {{ additive_encrypted_message }}
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="additive_decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="additive_encrypted_message" placeholder="Введіть зашифроване повідомлення">
+        </div>
+
+        {% if additive_decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ additive_decrypted_message }}
+
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+{% endblock %}

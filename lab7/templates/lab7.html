@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mt-4">Асиметричне шифрування з відкритим ключем. Алгоритм ElGamal</h3>
+</div>
+<!-- Завдання 1 -->
+<div class="container-fluid">
+    <h4 class="mt-4">ElGamal</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="elgamal_encrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="elgamal_original_message" placeholder="Введіть повідомлення" value="{{ elgamal_original_message }}">
+        </div>
+
+        {% if elgamal_encrypted_message %}
+        <div class="alert alert-success mb-3">
+            Приватний ключ збережено в файл /private_key.text
+            <br>
+        </div>
+        <div class="alert alert-success mb-3">
+            <strong>Шифрограма:</strong> {{ elgamal_encrypted_message }}
+            <br>
+        </div>
+        <div class="alert alert-success mb-3">
+            <strong>Публічний ключ:</strong> {{ elgamal_public_key }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="elgamal_decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="elgamal_encrypted_message" placeholder="Введіть повідомлення">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="elgamal_public_key" placeholder="Введіть публічний ключ">
+        </div>
+
+        {% if elgamal_decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ elgamal_decrypted_message }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+{% endblock %}

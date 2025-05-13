@@ -1,3 +1,6 @@
+import random
+
+
 class ModAdditionCipher:
     def __init__(self):
         self.scheme = {
@@ -150,3 +153,130 @@ class ModAdditionCipher:
 
         # Збираємо всі рядки в одну таблицю
         return "\n".join(table_rows)
+
+
+class AdditiveCipher:
+    def __init__(self):
+        self.scheme = {
+            "А": 0,
+            "Б": 1,
+            "В": 2,
+            "Г": 3,
+            "Ґ": 4,
+            "Д": 5,
+            "Е": 6,
+            "Є": 7,
+            "Ж": 8,
+            "З": 9,
+            "И": 10,
+            "І": 11,
+            "Ї": 12,
+            "Й": 13,
+            "К": 14,
+            "Л": 15,
+            "М": 16,
+            "Н": 17,
+            "О": 18,
+            "П": 19,
+            "Р": 20,
+            "С": 21,
+            "Т": 22,
+            "У": 23,
+            "Ф": 24,
+            "Х": 25,
+            "Ц": 26,
+            "Ч": 27,
+            "Ш": 28,
+            "Щ": 29,
+            "Ь": 30,
+            "Ю": 31,
+            "Я": 32,
+            " ": 33,  # Додаємо пробіл як символ алфавіту
+        }
+        self.reverse_scheme = {v: k for k, v in self.scheme.items()}
+        self.scheme_length = len(self.scheme)
+
+    def encrypt(self, message):
+        message = message.upper()
+
+        if not message:
+            return "", None
+
+        # Використовуємо довжину схеми як модуль
+        m = self.scheme_length
+
+        # Перетворюємо символи повідомлення на індекси
+        message_indices = []
+        for char in message:
+            if char in self.scheme:
+                message_indices.append(self.scheme[char])
+            else:
+                message_indices.append(-1)
+
+        # Шифруємо повідомлення
+        encrypted_indices = []
+
+        # Перший символ залишаємо незмінним
+        if message_indices:
+            encrypted_indices.append(message_indices[0])
+
+        # Використовуємо індекси попередніх символів для шифрування
+        for i in range(1, len(message_indices)):
+            if message_indices[i] != -1 and encrypted_indices[i - 1] != -1:
+                # Формула шифрування: X_i+1 = (X_i + X_i-1) mod m
+                encrypted_index = (message_indices[i] + encrypted_indices[i - 1]) % m
+                encrypted_indices.append(encrypted_index)
+            else:
+                encrypted_indices.append(message_indices[i])
+
+        # Перетворюємо зашифровані індекси назад у символи
+        encrypted_message = ""
+        for idx in encrypted_indices:
+            if idx != -1:
+                encrypted_message += self.reverse_scheme.get(idx, "?")
+            else:
+                encrypted_message += "?"
+
+        return (encrypted_message, m)
+
+    def decrypt(self, encrypted_message, m):
+        encrypted_message = encrypted_message.upper()
+
+        if not encrypted_message:
+            return ""
+
+        # Перетворюємо символи зашифрованого повідомлення на індекси
+        encrypted_indices = []
+        for char in encrypted_message:
+            if char in self.scheme:
+                encrypted_indices.append(self.scheme[char])
+            else:
+                encrypted_indices.append(-1)
+
+        # Розшифровуємо повідомлення
+        decrypted_indices = []
+
+        # Перший символ залишаємо незмінним
+        if encrypted_indices:
+            decrypted_indices.append(encrypted_indices[0])
+
+        # Використовуємо формулу дешифрування для інших символів
+        for i in range(1, len(encrypted_indices)):
+            if encrypted_indices[i] != -1 and encrypted_indices[i - 1] != -1:
+                # Формула дешифрування: X_i = (C_i - C_i-1 + m) % m
+                decrypted_index = (
+                    encrypted_indices[i] - encrypted_indices[i - 1] + m
+                ) % m
+                decrypted_indices.append(decrypted_index)
+            else:
+                decrypted_indices.append(encrypted_indices[i])
+
+        # Перетворюємо розшифровані індекси назад у символи
+        decrypted_message = ""
+        for idx in decrypted_indices:
+            if idx != -1:
+                decrypted_message += self.reverse_scheme.get(idx, "?")
+            else:
+                decrypted_message += "?"
+
+        return decrypted_message

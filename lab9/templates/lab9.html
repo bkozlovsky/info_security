@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mt-4">Хешування. Використання електронного підпису.</h3>
+</div>
+<!-- Завдання 1 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Електронний підпис RSA</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="rsa_sign_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="rsa_signatures" placeholder="Введіть повідомлення, що перевіряються" value="{{ rsa_signatures }}">
+        </div>
+
+        {% if rsa_validation %}
+        {% for val in rsa_validation %}
+            {% if val == True %}
+            <div class="alert alert-success mb-3">
+                <strong>Перевірка підписів RSA:</strong> {{ val }}
+                <br>
+            </div>
+            {% elif val == False %}
+            <div class="alert alert-danger mb-3">
+                <strong>Перевірка підписів RSA:</strong> {{ val }}
+                <br>
+            </div>
+            {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Перевірити підпис</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+<!-- Завдання 2 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Електронний підпис ElGamal</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="elgamal_sign_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="elgamal_hash_message" placeholder="Введіть хеш повідомлення" value="{{ elgamal_hash_message }}">
+        </div>
+
+        {% if elgamal_is_valid ==  True %}
+        <div class="alert alert-success mb-3">
+            <strong>Перевірка підпису ElGamal:</strong> {{ elgamal_is_valid }}
+            <br>
+        </div>
+        {% elif elgamal_is_valid == False %}
+        <div class="alert alert-danger mb-3">
+            <strong>Перевірка підпису ElGamal:</strong> {{ elgamal_is_valid }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Перевірити підпис</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

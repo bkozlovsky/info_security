@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mt-4">Асиметричне шифрування з відкритим ключем. Алгоритм на основі укладання ранця</h3>
+</div>
+<!-- Завдання 1 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Укладання ранця</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="knapsack_encrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="knapsack_original_message" placeholder="Введіть повідомлення" value="{{ knapsack_original_message }}">
+        </div>
+
+        {% if knapsack_encrypted_message %}
+            <div class="alert alert-success mb-3">
+                Приватний ключ збережено в файл /private_key.text
+                <br>
+            </div>
+            <div class="alert alert-success mb-3">
+                <strong>Шифрограма:</strong> {{ knapsack_encrypted_message }}
+                <br>
+            </div>
+            <div class="alert alert-success mb-3">
+                <strong>Публічний ключ:</strong> {{ knapsack_public_key }}
+                <br>
+            </div>
+            <div class="alert alert-success mb-3">
+                <strong>Бінарний код:</strong> <textarea class="form-control" id="exampleTextarea" rows="4" style="resize: none;"> {{ knapsack_binary_code }} </textarea>
+                <br>
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Символ</th>
+                        <th>Частина</th>
+                        <th>Двійковий блок</th>
+                        <th>Елементи ранця</th>
+                        <th>Сума ваг</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for block in knapsack_visualization_data %}
+                    <tr>
+                        <td>{{ block.character }}</td>
+                        <td>{{ block.part_label }}</td>
+                        <td>
+                            {% for bit in block.block %}
+                            <span class="{% if bit == '1' %}text-success fw-bold{% else %}text-secondary{% endif %}">{{ bit }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <ul class="list-inline">
+                            {% for weight_info in block.selected_weights %}
+                                <li class="list-inline-item">
+                                    {% if weight_info.weight > 0 %}
+                                    <span class="badge bg-success">
+                                        {% if weight_info.idx == 0 %}{{ knapsack_public_key.0 }}{% endif %}
+                                        {% if weight_info.idx == 1 %}{{ knapsack_public_key.1 }}{% endif %}
+                                        {% if weight_info.idx == 2 %}{{ knapsack_public_key.2 }}{% endif %}
+                                        {% if weight_info.idx == 3 %}{{ knapsack_public_key.3 }}{% endif %}
+                                        {% if weight_info.idx == 4 %}{{ knapsack_public_key.4 }}{% endif %}
+                                        {% if weight_info.idx == 5 %}{{ knapsack_public_key.5 }}{% endif %}
+                                        {% if weight_info.idx == 6 %}{{ knapsack_public_key.6 }}{% endif %}
+                                        {% if weight_info.idx == 7 %}{{ knapsack_public_key.7 }}{% endif %}
+                                        ({{ weight_info.idx }})
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-light text-dark">
+                                        {% if weight_info.idx == 0 %}{{ knapsack_public_key.0 }}{% endif %}
+                                        {% if weight_info.idx == 1 %}{{ knapsack_public_key.1 }}{% endif %}
+                                        {% if weight_info.idx == 2 %}{{ knapsack_public_key.2 }}{% endif %}
+                                        {% if weight_info.idx == 3 %}{{ knapsack_public_key.3 }}{% endif %}
+                                        {% if weight_info.idx == 4 %}{{ knapsack_public_key.4 }}{% endif %}
+                                        {% if weight_info.idx == 5 %}{{ knapsack_public_key.5 }}{% endif %}
+                                        {% if weight_info.idx == 6 %}{{ knapsack_public_key.6 }}{% endif %}
+                                        {% if weight_info.idx == 7 %}{{ knapsack_public_key.7 }}{% endif %}
+                                        ({{ weight_info.idx }})
+                                    </span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ block.weight_sum }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="knapsack_decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="knapsack_encrypted_message" placeholder="Введіть повідомлення">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="knapsack_public_key" placeholder="Введіть публічний ключ">
+        </div>
+
+        {% if knapsack_decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ knapsack_decrypted_message }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+{% endblock %}

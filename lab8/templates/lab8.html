@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mt-4">Хешування. Створення та аналіз хеш-функцій.</h3>
+</div>
+<!-- Завдання 1 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Хеш функції</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="hashing_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="hashing_original_message" placeholder="Введіть повідомлення" value="{{ hashing_original_message }}">
+        </div>
+
+        {% if checksum_parity %}
+        <div class="alert alert-success mb-3">
+            <strong>Хеш (метод контрольних сум):</strong> {{ checksum_parity }}
+            <br>
+        </div>
+        <div class="alert alert-success mb-3">
+            <strong>Хеш (метод середніх квадратів):</strong> {{ mid_square_hash }}
+            <br>
+        </div>
+        <div class="alert alert-success mb-3">
+            <strong>Хеш (модульне хешування):</strong> {{ modular_hash }}
+            <br>
+        </div>
+        <div class="alert alert-success mb-3">
+            <strong>Хеш (метод перетворення системи числення):</strong> {{ number_system_conversion }}
+            <br>
+        </div>
+        <div class="alert alert-success mb-3">
+            <strong>Хеш (метод згортання):</strong> {{ folding_hash }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Створити хеші</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+{% endblock %}

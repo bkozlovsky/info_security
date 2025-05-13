@@ -21,4 +21,11 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("lab1.urls")),
     path("", include("lab2.urls")),
+    path("", include("lab3.urls")),
+    path("", include("lab4.urls")),
+    path("", include("lab5.urls")),
+    path("", include("lab6.urls")),
+    path("", include("lab7.urls")),
+    path("", include("lab8.urls")),
+    path("", include("lab9.urls")),
 ]
