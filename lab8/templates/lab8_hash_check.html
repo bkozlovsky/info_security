@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mt-4">Хешування. Створення та аналіз хеш-функцій.</h3>
+</div>
+<!-- Завдання 1 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Хеш функції</h4>
+    <label class="mb-3" for="textInput">Перевірити цілісність даних</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="hashing_check_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="hashing_original_message" placeholder="Введіть повідомлення" value="{{ hashing_original_message }}">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="hashed_message" placeholder="Введіть хеш" value="{{ hashed_message }}">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="hash_function" placeholder="Введіть функцію хешування" value="{{ hash_function }}">
+        </div>
+
+        {% if hash_verification %}
+        <div class="alert alert-success mb-3">
+            <strong>Перевірка на цілісність:</strong> {{ hash_verification }}
+            <br>
+        </div>
+        {% elif hash_verification == False %}
+        <div class="alert alert-danger mb-3">
+            <strong>Перевірка на цілісність:</strong> {{ hash_verification }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Перевірка</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+{% endblock %}

@@ -6,55 +6,71 @@ class HashFunctions:
         pass
 
     # 1. Checksum parity word
-    def checksum_parity(self, data, blocks=4):
+    def checksum_parity(self, data, blocks=4, salt=None):
         """
         Splits data into specified number of blocks and calculates parity for each block.
 
         Args:
             data (bytes): Data to hash
             blocks (int): Number of blocks to split data into
+            salt (bytes): Optional salt for additional security
 
         Returns:
             str: Hexadecimal hash value
         """
         if not data:
-            return "0" * blocks  # Return zeros for empty data
+            return "0" * blocks
 
         # Ensure data is bytes
         if isinstance(data, str):
             data = data.encode('utf-8')
 
-        # Calculate block size, ensuring at least 1 byte per block
+        # Add salt if provided
+        if salt:
+            if isinstance(salt, str):
+                salt = salt.encode('utf-8')
+            data = salt + data
+
+        # Add position-dependent processing
         block_size = max(1, len(data) // blocks)
         remainder = len(data) % blocks
 
         checksums = []
 
         for i in range(blocks):
-            # Calculate start and end indices for this block
             start = i * block_size
             end = start + block_size
 
-            # Add an extra byte to early blocks if data doesn't divide evenly
             if i < remainder:
                 end += 1
 
-            # Handle the case where we're at the end of data
             if i == blocks - 1:
                 end = len(data)
 
-            # Extract the block
             block = data[start:end]
 
-            # Calculate parity by XORing all bytes in the block
+            # Enhanced parity calculation with position weighting
             parity = 0
-            for byte in block:
-                parity ^= byte
+            for j, byte in enumerate(block):
+                # Add position-dependent transformation
+                transformed_byte = (byte * (j + 1)) & 0xFF
+                # Rotate bits based on block index
+                rotated = ((transformed_byte << (i % 8)) | (transformed_byte >> (8 - (i % 8)))) & 0xFF
+                parity ^= rotated
 
+            # Mix with block index to prevent block reordering attacks
+            parity = (parity + i * 31) & 0xFF
             checksums.append(parity)
 
-        # Convert to hex string
+        # Final mixing step - combine all checksums
+        final_checksum = 0
+        for i, cs in enumerate(checksums):
+            final_checksum = (final_checksum * 33 + cs) & 0xFFFFFFFF
+
+        # Include final checksum in result for avalanche effect
         result = ''.join(f'{c:02x}' for c in checksums)
+        result += f'{final_checksum:08x}'
+
         return result
 
     # 2. Mid-Square hashing
@@ -181,61 +197,20 @@ class HashFunctions:
 
         return hash_value
 
-    # Common methods for both text and file
-    def hash_text(self, text, hash_function='checksum'):
-        """
-        Calculates hash of a text using the specified hash function.
-
-        Args:
-            text (str): Text to hash
-            hash_function (str): Name of the hash function to use
-
-        Returns:
-            Hash value
-        """
-        if hash_function == 'checksum':
-            return self.checksum_parity(text)
-        elif hash_function == 'mid_square':
-            return self.mid_square_hash(text)
-        elif hash_function == 'modular':
-            return self.modular_hash(text)
-        elif hash_function == 'number_system':
-            return self.number_system_conversion(text)
-        elif hash_function == 'folding':
-            return self.folding_hash(text)
-        else:
-            raise ValueError(f"Unknown hash function: {hash_function}")
-
-    def hash_file(self, file_path, hash_function='checksum'):
-        """
-        Calculates hash of a file using the specified hash function.
-
-        Args:
-            file_path (str): Path to the file
-            hash_function (str): Name of the hash function to use
-
-        Returns:
-            Hash value
-        """
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"File not found: {file_path}")
-
-        with open(file_path, 'rb') as f:
-            data = f.read()
-
-        return self.hash_text(data, hash_function)
-
-    def verify_integrity(self, original_data, hash_value, hash_function='checksum'):
-        """
-        Verifies the integrity of data by comparing its hash with a provided hash value.
-
-        Args:
-            original_data (str or bytes): Data to verify
-            hash_value: Expected hash value
-            hash_function (str): Name of the hash function to use
-
-        Returns:
-            bool: True if integrity is verified, False otherwise
-        """
-        current_hash = self.hash_text(original_data, hash_function)
-        return current_hash == hash_value
+    def verify_integrity(self, original_data, hash_value, hash_function_name):
+        hash_function = getattr(self, hash_function_name)
+        if hash_function_name == "checksum_parity":
+            calculated_hash = hash_function(original_data, blocks=4)
+            return hash_value == calculated_hash
+        elif hash_function_name == "folding_hash":
+            calculated_hash = hash_function(original_data, address_size=5)
+            return hash_value == calculated_hash
+        elif hash_function_name == "modular_hash":
+            calculated_hash = hash_function(original_data, mod=17)
+            return hash_value == calculated_hash
+        elif hash_function_name == "number_system_conversion":
+            calculated_hash = hash_function(original_data, p=2, q=4)
+            return hash_value == calculated_hash
+        elif hash_function_name == "mid_square_hash":
+            calculated_hash = hash_function(original_data, digits_to_extract=(0, 1))
+            return hash_value == calculated_hash
