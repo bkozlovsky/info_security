@@ -28,4 +28,5 @@ urlpatterns = [
     path("", include("lab7.urls")),
     path("", include("lab8.urls")),
     path("", include("lab9.urls")),
+    path("", include("lab10.urls")),
 ]

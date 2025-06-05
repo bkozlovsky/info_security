@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mt-4">Основи криптоаналізу</h3>
+</div>
+<!-- Завдання 1 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Шифри простої заміни</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="frequency_substitution_encrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="frequency_substitution_original_message" placeholder="Введіть повідомлення" value="{{ frequency_substitution_original_message }}">
+        </div>
+
+        {% if frequency_substitution_encrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Шифрограма:</strong> {{ frequency_substitution_encrypted_message }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="frequency_substitution_decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="frequency_substitution_encrypted_message" placeholder="Введіть повідомлення">
+        </div>
+
+        {% if frequency_substitution_decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ frequency_substitution_decrypted_message }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+<!-- Завдання 2 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Шифри простого пересування</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="transposition_encrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="transposition_original_message" placeholder="Введіть повідомлення" value="{{ transposition_original_message }}">
+        </div>
+
+        {% if transposition_encrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Шифрограма:</strong> {{ transposition_encrypted_message }}
+            <br>
+        </div>
+        <div class="alert alert-success mb-3">
+            <strong>Мета-дані:</strong> {{ transposition_meta_data }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="transposition_decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="transposition_encrypted_message" placeholder="Введіть повідомлення">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="transposition_meta_data" placeholder="Введіть мета дані">
+        </div>
+
+        {% if transposition_decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ transposition_decrypted_message }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+<!-- Завдання 3 -->
+<div class="container-fluid">
+    <h4 class="mt-4">Шифри табличного (стовпцевого) пересування</h4>
+    <label class="mb-3" for="textInput">Зашифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="сolumnartransposition_encrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="сolumnartransposition_original_message" placeholder="Введіть повідомлення" value="{{ сolumnartransposition_original_message }}">
+        </div>
+
+        {% if сolumnartransposition_encrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Шифрограма:</strong> {{ сolumnartransposition_encrypted_message }}
+            <br>
+        </div>
+        <div class="alert alert-success mb-3">
+            <strong>Ключ:</strong> {{ сolumnartransposition_key }}
+            <br>
+        </div>
+        <div class="alert alert-success mb-3">
+            <strong>Мета дані:</strong> {{ сolumnartransposition_meta_data }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Зашифрувати</button>
+        </div>
+    </form>
+</div>
+<div class="container-fluid">
+    <label class="mb-3" for="textInput">Розшифрувати повідомлення</label>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="сolumnartransposition_decrypt_form">
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="сolumnartransposition_encrypted_message" placeholder="Введіть повідомлення">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="сolumnartransposition_key" placeholder="Введіть ключ">
+        </div>
+        <div class="form-group mb-3">
+            <input type="text" class="form-control" id="textInput" name="сolumnartransposition_meta_data" placeholder="Введіть мета дані">
+        </div>
+
+        {% if сolumnartransposition_decrypted_message %}
+        <div class="alert alert-success mb-3">
+            <strong>Розшифроване повідомлення:</strong> {{ сolumnartransposition_decrypted_message }}
+            <br>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">Розшифрувати</button>
+        </div>
+    </form>
+</div>
+<hr class="hr" />
+{% endblock %}

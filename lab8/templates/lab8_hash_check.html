@@ -18,7 +18,13 @@
             <input type="text" class="form-control" id="textInput" name="hashed_message" placeholder="Введіть хеш" value="{{ hashed_message }}">
         </div>
         <div class="form-group mb-3">
-            <input type="text" class="form-control" id="textInput" name="hash_function" placeholder="Введіть функцію хешування" value="{{ hash_function }}">
+            <select class="form-control" id="hashFunctionSelect" name="hash_function">
+                <option value="checksum_parity" {% if hash_function == 'checksum_parity' %}selected{% endif %}>checksum_parity</option>
+                <option value="folding_hash" {% if hash_function == 'folding_hash' %}selected{% endif %}>folding_hash</option>
+                <option value="modular_hash" {% if hash_function == 'modular_hash' %}selected{% endif %}>modular_hash</option>
+                <option value="number_system_conversion" {% if hash_function == 'number_system_conversion' %}selected{% endif %}>number_system_conversion</option>
+                <option value="mid_square_hash" {% if hash_function == 'mid_square_hash' %}selected{% endif %}>mid_square_hash</option>
+            </select>
         </div>
 
         {% if hash_verification %}
